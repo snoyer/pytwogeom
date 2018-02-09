@@ -13,8 +13,9 @@ def setup() :
         """write file containing library path used at compile time"""
         def run(self):
             install_lib.run(self)
-            with open(os.path.join(self.install_dir, 'pytwogeom', 'ld_library_path'), 'w') as out :
-                print >>out, lib2geom_dir
+            txt_path = os.path.join(self.install_dir, 'pytwogeom', 'ld_library_path')
+            with open(txt_path, 'w') as out:
+                out.write(lib2geom_dir)
 
     setuptools.setup(
         name='pytwogeom',
@@ -31,7 +32,7 @@ def setup() :
                 ['src/pytwogeom.cpp'],
                 include_dirs=['src', lib2geom_include],
                 library_dirs=[lib2geom_dir],
-                libraries=['boost_python', lib2geom_libname],
+                libraries=['boost_python', lib2geom_libname, 'cairo', 'gsl', 'glib-2.0'],
                 language='c++11',
             ),
         ],
@@ -45,19 +46,20 @@ def setup() :
 def locate(*names) :
     p = subprocess.Popen(['locate']+list(names), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out,err = p.communicate()
-    for path in out.splitlines() :
+    for path in out.decode('utf8').splitlines() :
         for i,name in enumerate(names) :
             if path.endswith(name) :
                 dirname = path[:-len(name)]
                 if os.path.isdir(dirname) :
-                    yield path[:-len(name)], name
+                    yield dirname, name
 
 def locate_best(*names) :
     match_priority = {k:i for i,k in enumerate(names)}
-    def score((path,file)) :
+    def score(path_name) :
+        path,name = path_name
         folders = os.path.normpath(path).split(os.sep)
         return (
-            match_priority.get(file),
+            match_priority.get(name),
             0 if 'include' in folders else 1,
             len([f for f in folders if f.startswith('.')]),
             len(folders),
@@ -66,7 +68,7 @@ def locate_best(*names) :
     return min(locate(*names), key=score)
 
 def find_include_dir_for(*names) :
-    dirname,file = locate_best(*names)
+    dirname,name = locate_best(*names)
     return dirname
 
 setup()
