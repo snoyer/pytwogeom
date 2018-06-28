@@ -16,9 +16,7 @@ void defs_transforms() {
         .def(init<Geom::Rotate>())
         .def(init<Geom::Scale>())
         .def(init<Geom::Translate>())
-
         .def("inverse", &Geom::Affine::inverse)
-
         .def(self * self)
         .def(self * Geom::Rotate())
         .def(self * Geom::Scale())
@@ -35,6 +33,8 @@ void defs_transforms() {
         .def(Geom::Point() * self)
         .def(self * self)
         .def(Geom::Affine() * self)
+        .def(self * other<Geom::Scale>())
+        .def(self * other<Geom::Translate>())
     ;
 
     class_<Geom::Scale>("Scale")
@@ -45,6 +45,8 @@ void defs_transforms() {
         .def(Geom::Point() * self)
         .def(self * self)
         .def(self * Geom::Affine())
+        .def(self * other<Geom::Rotate>())
+        .def(self * other<Geom::Translate>())
     ;
 
     class_<Geom::Translate>("Translate")

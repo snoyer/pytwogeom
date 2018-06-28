@@ -11,4 +11,4 @@ except ImportError as e :
     else:
         raise
 
-from subdivision import *
+from .subdivision import *

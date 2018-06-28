@@ -1,4 +1,4 @@
-import os
+import os, sys
 import subprocess
 import setuptools
 from setuptools.command.install_lib import install_lib
@@ -28,11 +28,14 @@ def setup() :
         install_requires=[],
         ext_modules=[
             setuptools.Extension(
-                'pytwogeom._pytwogeom',
-                ['src/pytwogeom.cpp'],
+                name='_pytwogeom',
+                sources=['src/pytwogeom.cpp'],
                 include_dirs=['src', lib2geom_include],
                 library_dirs=[lib2geom_dir],
-                libraries=['boost_python', lib2geom_libname, 'cairo', 'gsl', 'glib-2.0'],
+                libraries=[
+                    'boost_python3' if sys.version_info >= (3,0) else 'boost_python2',
+                    lib2geom_libname, 'cairo', 'gsl', 'glib-2.0'
+                ],
                 language='c++11',
             ),
         ],

@@ -17,6 +17,14 @@ Geom::PathVector boolop_intersection(const Geom::PathVector& a, const Geom::Path
     return Geom::PathIntersectionGraph(a, b).getIntersection();
 }
 
+Geom::PathVector boolop_minus(const Geom::PathVector& a, const Geom::PathVector& b){
+    return Geom::PathIntersectionGraph(a, b).getAminusB();
+}
+
+Geom::PathVector boolop_xor(const Geom::PathVector& a, const Geom::PathVector& b){
+    return Geom::PathIntersectionGraph(a, b).getXOR();
+}
+
 
 Geom::Path bezier_fit(const boost::python::list& point_list, const double tolerance_sq, const unsigned max_beziers){
 
@@ -112,11 +120,32 @@ std::vector<Geom::Point> find_intersection_points_pwd2sb(
     return intersections;
 }
 
+
+int turn_direction(const Geom::Point& a, const Geom::Point& b, const Geom::Point& c){
+    if(a == b || b == c || c == a) return 0;
+    const Geom::Coord x = Geom::cross(b-a, c-a);
+    if(x < 0) return +1;
+    if(x > 0) return -1;
+    return 0;
+}
+
+int path_direction(const Geom::Path& path){
+    double area;
+    Geom::Point centre;
+    Geom::centroid(path.toPwSb(), centre, area);
+    if(area > 0) return +1;
+    if(area < 0) return -1;
+    return 0;
+}
+
+
 void defs_algorithms() {
     using namespace boost::python;
 
     def("boolop_union", &boolop_union);
     def("boolop_intersection", &boolop_intersection);
+    def("boolop_minus", &boolop_minus);
+    def("boolop_xor", &boolop_xor);
 
     def("fit_path", &bezier_fit,
         (arg("points"), arg("tolerance_sq"), arg("max_beziers")=256));
@@ -129,4 +158,7 @@ void defs_algorithms() {
 
     def("find_intersection_points", &find_intersection_points_pwd2sb,
         (arg("pwd2sb1"), arg("pwd2sb2"), arg("precision")=.00001));
+
+    def("turn_direction", &turn_direction);
+    def("path_direction", &path_direction);
 }

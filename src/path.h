@@ -73,6 +73,8 @@ void defs_path() {
         .def("set_stitching", &Geom::Path::setStitching)
         // .def("appendNew", &Geom::Path::appendNew)
 
+        .def("winding", &Geom::Path::winding)
+
         .def(self * Geom::Affine())
 
         /* not in original class */
@@ -86,11 +88,15 @@ void defs_path() {
         .def("bounds_fast" , &Geom::PathVector::boundsFast , return_value_policy<return_Opt>())
         .def("bounds_exact", &Geom::PathVector::boundsExact, return_value_policy<return_Opt>())
 
-        // .def("reversed", &Geom::PathVector::reversed)
-        // .def("reverse", &Geom::PathVector::reverse)
+        .def("initial_point", &Geom::PathVector::initialPoint)
+        .def("final_point", &Geom::PathVector::finalPoint)
+        .def("reversed", &Geom::PathVector::reversed)
+        .def("reverse", &Geom::PathVector::reverse)
         //
         // .def(self * Geom::Affine())
         // .def(self *= Geom::Affine())
+
+        .def("winding", &Geom::PathVector::winding)
 
         .def(self * Geom::Affine())
 
@@ -101,6 +107,9 @@ void defs_path() {
 
     def("paths_from_piecewise", Geom::path_from_piecewise,
         (arg("piecewise"), arg("tol")=1., arg("only_cubic")=true));
+
+    def("path_from_sbasis", Geom::path_from_sbasis,
+        (arg("d2sbasis"), arg("tol")=1., arg("only_cubic")=true));
 
 
     def("parse_svg_path", parse_svg_path_str);
